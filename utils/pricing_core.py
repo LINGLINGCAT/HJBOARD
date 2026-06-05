@@ -38,6 +38,9 @@ def build_quote_rows(df_lme, df_fx) -> tuple[list[dict], str | None]:
         return [], "缺少 LME 銅/錫/鋅或美金匯率"
 
     r, p, q, d = _b(cu, sn, zn, fx, alloy)
+    t = (
+        cu * _num(alloy, "qts_cu") / 100 + zn * _num(alloy, "qts_zn") / 100
+    ) / 1000 * fx
 
     def row(
         name: str,
@@ -59,6 +62,7 @@ def build_quote_rows(df_lme, df_fx) -> tuple[list[dict], str | None]:
             q * _rate(items, "qing_dian") - _num(items, "qing_dian_sub"),
             1,
         ),
+        row("青銅絲", t * _rate(items, "qing_tong_si"), 1),
         row("光亮線", r * _rate(items, "guang_liang_xian"), 2),
         row("光亮米", r * _rate(items, "guang_liang_mi"), 2),
         row(
