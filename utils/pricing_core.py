@@ -54,7 +54,7 @@ def build_quote_rows(df_lme, df_fx) -> tuple[list[dict], str | None]:
         return out
 
     return [
-        row("仁碎", p * _rate(items, "ren_sui"), 1),
+        row("磷碎", p * _rate(items, "ren_sui"), 1),
         row("紅碎", r * _rate(items, "hong_sui"), 1),
         row("青碎", q * _rate(items, "qing_sui"), 1),
         row(
