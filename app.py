@@ -33,6 +33,12 @@ FOOTER_LINES = [
 NOTE_ONE = "註一:需乾淨無油無雜質，銅管、粗鍍錫線、鍍錫板需分開裝"
 TZ_TAIPEI = ZoneInfo("Asia/Taipei")
 
+MARKET_NOTICE_TITLE = "請注意"
+MARKET_NOTICE_LINES = [
+    "本看板價格依國際銅價更新",
+    "國際市場休市期間（週末及部分假日）不會產生新報價，因此價格將維持最後收盤價",
+]
+
 DISCLAIMER = (
     "【免責聲明】本看板所示價格僅供參考，非成交承諾；"
     "實際收購價格須經本公司電話或 LINE 確認後方為有效報價，未確認前不構成交易要約。"
@@ -73,12 +79,14 @@ def _render_price_table(rows: list[dict], col: int, wide: bool = False) -> str:
 def _build_board_html(
     rows: list[dict],
     today: str,
+    updated_at: str,
     side_html: str,
     qr_block: str,
 ) -> str:
     col1 = _render_price_table(rows, 1)
     col2 = _render_price_table(rows, 2, wide=True)
     col3 = _render_price_table(rows, 3)
+    notice_body = "".join(f"<p>{line}</p>" for line in MARKET_NOTICE_LINES)
 
     return f"""<!DOCTYPE html>
 <html lang="zh-Hant">
@@ -121,6 +129,32 @@ body {{
     font-weight: 600;
     color: #444;
 }}
+.board-updated {{
+    font-size: clamp(0.88rem, 2.2vw, 1.05rem);
+    font-weight: 600;
+    color: #555;
+    margin-top: 4px;
+}}
+.market-notice {{
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    background: #f0f4f8;
+    border: 1px solid #c8d0d8;
+    border-radius: 6px;
+}}
+.market-notice-title {{
+    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+    font-weight: 700;
+    color: #1e4f8a;
+    margin-bottom: 6px;
+}}
+.market-notice p {{
+    margin: 0 0 4px 0;
+    font-size: clamp(0.82rem, 1.9vw, 0.95rem);
+    line-height: 1.55;
+    color: #333;
+}}
+.market-notice p:last-child {{ margin-bottom: 0; }}
 .board-body {{
     display: flex;
     gap: 18px;
@@ -282,6 +316,10 @@ body {{
     .price-table td.cell-name-split .name-line {{ margin: 4px 0; }}
     .price-table td.cell-price {{ font-size: 1.45rem; }}
     .note-under-table {{ font-size: 0.95rem; text-align: left; padding: 8px 2px 0; }}
+    .market-notice {{ margin-bottom: 12px; }}
+    .market-notice-title {{ font-size: 1.05rem; }}
+    .market-notice p {{ font-size: 0.95rem; }}
+    .board-updated {{ font-size: 1rem; }}
 }}
 @media (max-width: 480px) {{
     .board-title {{ font-size: 1.5rem; }}
@@ -296,7 +334,14 @@ body {{
 <div class="board-wrap">
     <div class="board-header">
         <div class="board-title">{COMPANY_NAME}</div>
-        <div class="board-date">{today}</div>
+        <div class="board-meta">
+            <div class="board-date">{today}</div>
+            <div class="board-updated">更新時間：{updated_at}</div>
+        </div>
+    </div>
+    <div class="market-notice">
+        <div class="market-notice-title">{MARKET_NOTICE_TITLE}</div>
+        {notice_body}
     </div>
     <div class="board-body">
         <div class="board-left">
@@ -350,6 +395,7 @@ def main() -> None:
     )
 
     today = datetime.now(TZ_TAIPEI).strftime("%Y/%m/%d")
+    updated_at = datetime.now(TZ_TAIPEI).strftime("%Y/%m/%d %H:%M")
 
     df_lme, lme_err = fetch_lme_data()
     df_fx, fx_err = fetch_bot_fx_data()
@@ -370,8 +416,8 @@ def main() -> None:
         else ""
     )
 
-    html_doc = _build_board_html(rows, today, side_html, qr_block)
-    components.html(html_doc, height=1080, scrolling=True)
+    html_doc = _build_board_html(rows, today, updated_at, side_html, qr_block)
+    components.html(html_doc, height=1140, scrolling=True)
 
 
 if __name__ == "__main__":
