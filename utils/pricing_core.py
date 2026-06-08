@@ -77,9 +77,13 @@ def build_quote_rows(df_lme, df_fx) -> tuple[list[dict], str | None]:
             ["乾淨紅銅管 / 乾淨粗鍍錫", "線、板 / 破碎銅(註一)"],
         ),
         row("紅白米(含銅98.2%↑)", r * _rate(items, "hong_bai_mi"), 2),
-        row("次級紅清", r * _rate(items, "ci_ji"), 2),
+        row(
+            "油管/螺旋管/帶雜銅管",
+            r * _rate(items, "ci_ji"),
+            2,
+            ["油管 / 螺旋管 /", "帶雜銅管"],
+        ),
         row("馬達銅", r * _rate(items, "ma_da"), 2),
-        row("紅雜銅", r * _rate(items, "hong_za"), 2),
         row("大青", d * _rate(items, "da_qing"), 3),
         row("中銅", d * _rate(items, "zhong_tong"), 3),
     ], None
