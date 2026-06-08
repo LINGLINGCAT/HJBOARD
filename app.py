@@ -10,7 +10,6 @@ import streamlit.components.v1 as components
 from streamlit_autorefresh import st_autorefresh
 
 from utils.data_fetch import calculate_board_prices, fetch_bot_fx_data, fetch_lme_data
-from utils.market_hours import is_lme_market_open
 
 COMPANY_NAME = "聖展金屬有限公司"
 LINE_PHONE = "0903226073"
@@ -81,7 +80,6 @@ def _build_board_html(
     rows: list[dict],
     today: str,
     updated_at: str,
-    market_open: bool,
     side_html: str,
     qr_block: str,
 ) -> str:
@@ -89,7 +87,6 @@ def _build_board_html(
     col2 = _render_price_table(rows, 2, wide=True)
     col3 = _render_price_table(rows, 3)
     notice_body = "".join(f"<p>{line}</p>" for line in MARKET_NOTICE_LINES)
-    market_tag = "" if market_open else "（休市中，價格為最後更新）"
 
     return f"""<!DOCTYPE html>
 <html lang="zh-Hant">
@@ -339,7 +336,7 @@ body {{
         <div class="board-title">{COMPANY_NAME}</div>
         <div class="board-meta">
             <div class="board-date">{today}</div>
-            <div class="board-updated">更新時間：{updated_at}{market_tag}</div>
+            <div class="board-updated">報價更新時間：{updated_at}</div>
         </div>
     </div>
     <div class="market-notice">
@@ -373,33 +370,38 @@ body {{
 </html>"""
 
 
-def _load_board_cache() -> tuple[list[dict], str, bool, str | None]:
-    market_open = is_lme_market_open()
+def _price_signature(rows: list[dict]) -> tuple[str, ...]:
+    return tuple(r["單價"] for r in rows)
+
+
+def _load_board_cache() -> tuple[list[dict], str, str | None]:
     cache = st.session_state.get("board_cache")
-    should_fetch = market_open or cache is None
 
-    if should_fetch:
-        df_lme, lme_err = fetch_lme_data()
-        df_fx, fx_err = fetch_bot_fx_data()
-        if lme_err or fx_err:
-            if cache is not None:
-                return cache["rows"], cache["updated_at"], market_open, None
-            return [], "", market_open, lme_err or fx_err
+    df_lme, lme_err = fetch_lme_data()
+    df_fx, fx_err = fetch_bot_fx_data()
+    if lme_err or fx_err:
+        if cache is not None:
+            return cache["rows"], cache["updated_at"], None
+        return [], "", lme_err or fx_err
 
-        rows, calc_err = calculate_board_prices(df_lme, df_fx)
-        if calc_err:
-            if cache is not None:
-                return cache["rows"], cache["updated_at"], market_open, None
-            return [], "", market_open, calc_err
+    rows, calc_err = calculate_board_prices(df_lme, df_fx)
+    if calc_err:
+        if cache is not None:
+            return cache["rows"], cache["updated_at"], None
+        return [], "", calc_err
 
+    signature = _price_signature(rows)
+    if cache is None or cache.get("signature") != signature:
         updated_at = datetime.now(TZ_TAIPEI).strftime("%Y/%m/%d %H:%M")
-        st.session_state.board_cache = {
-            "rows": rows,
-            "updated_at": updated_at,
-        }
-        return rows, updated_at, market_open, None
+    else:
+        updated_at = cache["updated_at"]
 
-    return cache["rows"], cache["updated_at"], market_open, None
+    st.session_state.board_cache = {
+        "rows": rows,
+        "updated_at": updated_at,
+        "signature": signature,
+    }
+    return rows, updated_at, None
 
 
 def main() -> None:
@@ -427,7 +429,7 @@ def main() -> None:
     )
 
     today = datetime.now(TZ_TAIPEI).strftime("%Y/%m/%d")
-    rows, updated_at, market_open, load_err = _load_board_cache()
+    rows, updated_at, load_err = _load_board_cache()
 
     if load_err:
         st.error(load_err)
@@ -448,7 +450,7 @@ def main() -> None:
         else ""
     )
 
-    html_doc = _build_board_html(rows, today, updated_at, market_open, side_html, qr_block)
+    html_doc = _build_board_html(rows, today, updated_at, side_html, qr_block)
     components.html(html_doc, height=1140, scrolling=True)
 
 
