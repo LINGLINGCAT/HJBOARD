@@ -111,29 +111,30 @@ body {{
 }}
 .board-header {{
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: baseline;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px 16px;
     border-bottom: 2px solid #1e4f8a;
     padding-bottom: 12px;
     margin-bottom: 16px;
+}}
+.board-header-main {{
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 18px;
 }}
 .board-title {{
     font-size: clamp(1.35rem, 4vw, 2rem);
     font-weight: 700;
     letter-spacing: 0.1em;
-}}
-.board-date {{
-    font-size: clamp(1rem, 2.5vw, 1.2rem);
-    font-weight: 600;
-    color: #444;
+    white-space: nowrap;
 }}
 .board-updated {{
     font-size: clamp(0.88rem, 2.2vw, 1.05rem);
     font-weight: 600;
     color: #555;
-    margin-top: 4px;
+    white-space: nowrap;
 }}
 .market-notice {{
     margin-bottom: 14px;
@@ -279,7 +280,13 @@ body {{
     }}
     .board-wrap {{ padding: 16px 12px 18px; }}
     .board-title {{ font-size: 1.65rem; }}
-    .board-date {{ font-size: 1.15rem; }}
+    .board-updated {{ font-size: 1rem; }}
+    .board-header-main {{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }}
+    .board-updated {{ white-space: normal; }}
     .board-body {{ flex-direction: column; }}
     .board-side {{
         flex: none;
@@ -319,7 +326,6 @@ body {{
     .market-notice {{ margin-bottom: 12px; }}
     .market-notice-title {{ font-size: 1.05rem; }}
     .market-notice p {{ font-size: 0.95rem; }}
-    .board-updated {{ font-size: 1rem; }}
 }}
 @media (max-width: 480px) {{
     .board-title {{ font-size: 1.5rem; }}
@@ -333,9 +339,8 @@ body {{
 <body>
 <div class="board-wrap">
     <div class="board-header">
-        <div class="board-title">{COMPANY_NAME}</div>
-        <div class="board-meta">
-            <div class="board-date">{today}</div>
+        <div class="board-header-main">
+            <div class="board-title">{COMPANY_NAME}</div>
             <div class="board-updated">報價更新時間：{updated_at}</div>
         </div>
     </div>
@@ -356,7 +361,7 @@ body {{
         </div>
         <div class="board-side">
             {side_html}
-            <p class="board-contact">手機號碼/Line:{LINE_PHONE}<br>{today}</p>
+            <p class="board-contact">手機號碼/Line:{LINE_PHONE}</p>
             <div class="disclaimer-box">{DISCLAIMER}</div>
             <p class="website-row">
                 宏展金屬企業網站：
