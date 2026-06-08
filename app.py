@@ -215,8 +215,8 @@ body {{
 }}
 .price-table td.cell-name-split {{
     width: 72%;
-    font-size: clamp(0.88rem, 2vw, 1.05rem);
-    line-height: 1.45;
+    font-size: clamp(1rem, 2.4vw, 1.22rem);
+    line-height: 1.4;
     padding: 10px 5px;
 }}
 .price-table td.cell-name-split .name-line {{
@@ -319,7 +319,7 @@ body {{
     }}
     .price-table th {{ font-size: 1.15rem; }}
     .price-table td.cell-name {{ font-size: 1.2rem; }}
-    .price-table td.cell-name-split {{ font-size: 1.08rem; }}
+    .price-table td.cell-name-split {{ font-size: 1.2rem; }}
     .price-table td.cell-name-split .name-line {{ margin: 4px 0; }}
     .price-table td.cell-price {{ font-size: 1.45rem; }}
     .note-under-table {{ font-size: 0.95rem; text-align: left; padding: 8px 2px 0; }}
@@ -331,7 +331,7 @@ body {{
     .board-title {{ font-size: 1.5rem; }}
     .price-table th {{ font-size: 1.1rem; }}
     .price-table td.cell-name {{ font-size: 1.15rem; }}
-    .price-table td.cell-name-split {{ font-size: 1.05rem; }}
+    .price-table td.cell-name-split {{ font-size: 1.15rem; }}
     .price-table td.cell-price {{ font-size: 1.35rem; }}
 }}
 </style>
