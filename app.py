@@ -52,6 +52,56 @@ def _qr_img_tag() -> str:
     return f'<img class="line-qr" src="data:image/png;base64,{b64}" alt="LINE" />'
 
 
+def _render_mobile_sticky_header(updated_at: str) -> None:
+    """手機版固定頂欄：截圖或捲動時仍看得到公司名稱與更新時間。"""
+    st.markdown(
+        f"""
+        <div id="hj-mobile-bar">
+            <div class="hj-mobile-title">{COMPANY_NAME}</div>
+            <div class="hj-mobile-updated">報價更新時間：{updated_at}</div>
+        </div>
+        <style>
+        #hj-mobile-bar {{
+            display: none;
+        }}
+        @media (max-width: 900px) {{
+            #hj-mobile-bar {{
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 999999;
+                background: #fff;
+                border-bottom: 2px solid #1e4f8a;
+                padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }}
+            #hj-mobile-bar .hj-mobile-title {{
+                font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+                font-size: 1.15rem;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                color: #1a1a1a;
+            }}
+            #hj-mobile-bar .hj-mobile-updated {{
+                font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+                font-size: 0.92rem;
+                font-weight: 600;
+                color: #555;
+            }}
+            [data-testid="stAppViewContainer"] .block-container {{
+                padding-top: calc(4.6rem + env(safe-area-inset-top, 0px)) !important;
+            }}
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def _render_name_label(text: str, lines: list[str] | None) -> str:
     if lines:
         return "".join(f'<div class="name-line">{ln}</div>' for ln in lines)
@@ -292,6 +342,7 @@ body {{
         text-size-adjust: 100%;
     }}
     .board-wrap {{ padding: 16px 12px 18px; }}
+    .board-header {{ display: none; }}
     .board-title {{ font-size: 1.65rem; }}
     .board-updated {{ font-size: 1rem; }}
     .board-header-main {{
@@ -471,6 +522,7 @@ def main() -> None:
     )
 
     html_doc = _build_board_html(rows, today, updated_at, side_html, qr_block)
+    _render_mobile_sticky_header(updated_at)
     components.html(html_doc, height=1140, scrolling=True)
 
 
