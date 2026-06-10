@@ -36,7 +36,7 @@ TZ_TAIPEI = ZoneInfo("Asia/Taipei")
 MARKET_NOTICE_TITLE = "請注意"
 MARKET_NOTICE_LINES = [
     "本看板價格依國際銅價更新",
-    "國際市場休市期間（週末及部分假日）不會產生新報價，因此價格將維持最後收盤價",
+    "國際市場休市期間（週末及部分假日）無即時報價，看板僅顯示「最後收盤價」作為參考，並非市場即時價格",
 ]
 
 DISCLAIMER = (
