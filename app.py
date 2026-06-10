@@ -68,7 +68,7 @@ def _render_mobile_sticky_header(updated_at: str) -> None:
             #hj-mobile-bar {{
                 display: flex;
                 flex-direction: column;
-                gap: 2px;
+                gap: 4px;
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -76,24 +76,34 @@ def _render_mobile_sticky_header(updated_at: str) -> None:
                 z-index: 999999;
                 background: #fff;
                 border-bottom: 2px solid #1e4f8a;
-                padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px;
+                padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             }}
             #hj-mobile-bar .hj-mobile-title {{
                 font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
-                font-size: 1.15rem;
+                font-size: 1.65rem;
                 font-weight: 700;
-                letter-spacing: 0.08em;
+                letter-spacing: 0.1em;
                 color: #1a1a1a;
+                line-height: 1.25;
             }}
             #hj-mobile-bar .hj-mobile-updated {{
                 font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
-                font-size: 0.92rem;
+                font-size: 1rem;
                 font-weight: 600;
                 color: #555;
+                line-height: 1.3;
             }}
             [data-testid="stAppViewContainer"] .block-container {{
-                padding-top: calc(4.6rem + env(safe-area-inset-top, 0px)) !important;
+                padding-top: calc(5.4rem + env(safe-area-inset-top, 0px)) !important;
+            }}
+        }}
+        @media (max-width: 480px) {{
+            #hj-mobile-bar .hj-mobile-title {{
+                font-size: 1.5rem;
+            }}
+            [data-testid="stAppViewContainer"] .block-container {{
+                padding-top: calc(5.1rem + env(safe-area-inset-top, 0px)) !important;
             }}
         }}
         </style>
