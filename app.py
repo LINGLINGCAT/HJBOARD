@@ -52,18 +52,30 @@ def _qr_img_tag() -> str:
     return f'<img class="line-qr" src="data:image/png;base64,{b64}" alt="LINE" />'
 
 
+def _render_name_label(text: str, lines: list[str] | None) -> str:
+    if lines:
+        return "".join(f'<div class="name-line">{ln}</div>' for ln in lines)
+    return text
+
+
 def _render_price_table(rows: list[dict], col: int, wide: bool = False) -> str:
     items = [r for r in rows if r["col"] == col]
     cls = "price-table wide-table" if wide else "price-table"
     body = ""
     for r in items:
-        if r.get("品名_lines"):
-            lines = r["品名_lines"]
-            label = "".join(f'<div class="name-line">{ln}</div>' for ln in lines)
-            name_cls = "cell-name cell-name-split"
-        else:
-            label = r["品名"]
-            name_cls = "cell-name"
+        desktop_label = _render_name_label(r["品名"], r.get("品名_lines"))
+        mobile_label = _render_name_label(
+            r["品名"],
+            r.get("品名_lines_mobile") or r.get("品名_lines"),
+        )
+        use_split = bool(
+            r.get("品名_lines") or r.get("品名_lines_mobile")
+        )
+        name_cls = "cell-name cell-name-split" if use_split else "cell-name"
+        label = (
+            f'<span class="name-view name-view-desktop">{desktop_label}</span>'
+            f'<span class="name-view name-view-mobile">{mobile_label}</span>'
+        )
         body += (
             f"<tr><td class='{name_cls}'>{label}</td>"
             f"<td class='cell-price'>{r['單價']}</td></tr>"
@@ -224,6 +236,7 @@ body {{
     text-align: center;
     margin: 2px 0;
 }}
+.name-view-mobile {{ display: none; }}
 .price-table td.cell-price {{
     width: 32%;
     font-weight: 700;
@@ -326,6 +339,8 @@ body {{
     .market-notice {{ margin-bottom: 12px; }}
     .market-notice-title {{ font-size: 1.05rem; }}
     .market-notice p {{ font-size: 0.95rem; }}
+    .name-view-desktop {{ display: none; }}
+    .name-view-mobile {{ display: block; }}
 }}
 @media (max-width: 480px) {{
     .board-title {{ font-size: 1.5rem; }}

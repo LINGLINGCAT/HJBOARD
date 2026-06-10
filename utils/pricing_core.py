@@ -47,10 +47,13 @@ def build_quote_rows(df_lme, df_fx) -> tuple[list[dict], str | None]:
         val: float,
         col: int,
         lines: list[str] | None = None,
+        mobile_lines: list[str] | None = None,
     ) -> dict:
         out = {"品名": name, "單價": _fmt_price(val), "col": col}
         if lines:
             out["品名_lines"] = lines
+        if mobile_lines:
+            out["品名_lines_mobile"] = mobile_lines
         return out
 
     return [
@@ -69,15 +72,26 @@ def build_quote_rows(df_lme, df_fx) -> tuple[list[dict], str | None]:
             "粉碎角銅(含銅99.8%↑)",
             r * _rate(items, "fen_sui_jiao_tong") - _num(items, "fen_sui_jiao_tong_sub"),
             2,
+            mobile_lines=["粉碎角銅", "(含銅99.8%↑)"],
         ),
         row(
             "乾淨紅銅管/破碎銅(註一)",
             r * _rate(items, "gan_jing"),
             2,
             ["乾淨紅銅管 / 乾淨粗鍍錫", "線、板 / 破碎銅(註一)"],
+            mobile_lines=[
+                "乾淨紅銅管 /",
+                "乾淨粗鍍錫線、鍍錫板 /",
+                "破碎銅(註一)",
+            ],
         ),
         row("紅白米(含銅98.2%↑)", r * _rate(items, "hong_bai_mi"), 2),
-        row("油管/螺旋管/帶雜銅管", r * _rate(items, "ci_ji"), 2),
+        row(
+            "油管/螺旋管/帶雜銅管",
+            r * _rate(items, "ci_ji"),
+            2,
+            mobile_lines=["油管/螺旋管/", "帶雜銅管"],
+        ),
         row("馬達銅", r * _rate(items, "ma_da"), 2),
         row("大青", d * _rate(items, "da_qing"), 3),
         row("中銅", d * _rate(items, "zhong_tong"), 3),
