@@ -52,6 +52,44 @@ def _qr_img_tag() -> str:
     return f'<img class="line-qr" src="data:image/png;base64,{b64}" alt="LINE" />'
 
 
+def _estimate_iframe_heights(rows: list[dict]) -> tuple[int, int]:
+    """回傳 (電腦版, 手機版) iframe 高度。"""
+    row_heights: dict[int, int] = {1: 56, 2: 72, 3: 56}
+
+    def column_table_h(col: int) -> int:
+        items = [r for r in rows if r["col"] == col]
+        extra = sum(
+            22
+            for r in items
+            if r.get("品名_lines") or r.get("品名_lines_mobile")
+        )
+        return 48 + len(items) * row_heights[col] + extra
+
+    desktop = 120 + max(column_table_h(1), column_table_h(2) + 80, column_table_h(3)) + 32
+    mobile = 200 + column_table_h(1) + column_table_h(2) + 80 + column_table_h(3) + 780
+    return max(960, desktop), max(1200, mobile)
+
+
+def _render_iframe_height_css(desktop_h: int, mobile_h: int) -> None:
+    st.markdown(
+        f"""
+        <style>
+        @media (min-width: 901px) {{
+            [data-testid="stAppViewContainer"] iframe {{
+                height: {desktop_h}px !important;
+            }}
+        }}
+        @media (max-width: 900px) {{
+            [data-testid="stAppViewContainer"] iframe {{
+                height: {mobile_h}px !important;
+            }}
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def _render_mobile_sticky_header(updated_at: str) -> None:
     """手機版固定頂欄：截圖或捲動時仍看得到公司名稱與更新時間。"""
     st.markdown(
@@ -96,6 +134,10 @@ def _render_mobile_sticky_header(updated_at: str) -> None:
             }}
             [data-testid="stAppViewContainer"] .block-container {{
                 padding-top: calc(5.4rem + env(safe-area-inset-top, 0px)) !important;
+                padding-bottom: 0 !important;
+            }}
+            [data-testid="stAppViewContainer"] iframe {{
+                display: block;
             }}
         }}
         @media (max-width: 480px) {{
@@ -532,8 +574,10 @@ def main() -> None:
     )
 
     html_doc = _build_board_html(rows, today, updated_at, side_html, qr_block)
+    desktop_h, mobile_h = _estimate_iframe_heights(rows)
     _render_mobile_sticky_header(updated_at)
-    components.html(html_doc, height=1140, scrolling=True)
+    _render_iframe_height_css(desktop_h, mobile_h)
+    components.html(html_doc, height=max(desktop_h, mobile_h), scrolling=False)
 
 
 if __name__ == "__main__":
