@@ -80,8 +80,8 @@ def build_quote_rows(df_lme, df_fx) -> tuple[list[dict], str | None]:
             2,
             ["乾淨紅銅管 / 乾淨粗鍍錫", "線、板 / 破碎銅(註一)"],
             mobile_lines=[
-                "乾淨紅銅管 /",
-                "粗鍍錫線、鍍錫板 /",
+                "乾淨紅銅管",
+                "粗鍍錫線、鍍錫板",
                 "破碎銅(註一)",
             ],
         ),
